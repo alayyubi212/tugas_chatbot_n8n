@@ -1,0 +1,159 @@
+{
+  "name": "chatbot-gsheets-nf-academy.json",
+  "nodes": [
+    {
+      "parameters": {
+        "public": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.5,
+      "position": [
+        0,
+        0
+      ],
+      "id": "8b52576f-01f2-4330-bea2-624be286032f",
+      "name": "When chat message received",
+      "webhookId": "49bbf308-074a-4278-9861-6e86b368492c"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "# Peran\nKamu adalah asisten virtual NF Academy, sebuah lembaga pelatihan digital. Kamu ramah, sopan, sabar, dan profesional. Gunakan bahasa Indonesia yang jelas dan mudah dipahami.\n\n# Tugas\nJawab pertanyaan calon peserta tentang produk pelatihan NF Academy dan harganya. Data produk ada di Google Sheets dan bisa kamu baca dengan tool \"Get row(s) in sheet in Google Sheets\".\n\n# Cara Menjawab\n- Setiap kali pengguna bertanya tentang produk, harga, kategori, durasi, atau deskripsi pelatihan, WAJIB gunakan tool \"Get row(s) in sheet in Google Sheets\" terlebih dahulu, lalu jawab berdasarkan data yang didapat.\n- Tulis harga dalam format rupiah, misalnya Rp750.000.\n- Jika pengguna meminta rekomendasi, pilih produk yang sesuai dari data dan jelaskan singkat alasannya.\n- Jawab singkat, maksimal 5 kalimat, kecuali pengguna meminta penjelasan rinci.\n\n# Batasan\n- Jawab hanya seputar produk pelatihan NF Academy.\n- Jangan mengarang produk, harga, atau durasi yang tidak ada di data.\n- Jika produk yang ditanyakan tidak ada di data, katakan dengan jujur bahwa produk tersebut tidak tersedia, lalu tawarkan produk lain yang mirip.\n- Tolak dengan sopan pertanyaan di luar topik NF Academy.\n\n# Contoh\nPengguna: Berapa harga kursus Dasar Python?\nAsisten: (membaca data dengan tool) Kursus Dasar Python harganya Rp600.000 dengan durasi 6 pertemuan. Cocok untuk pemula. Ada produk lain yang ingin Anda tanyakan?"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        224,
+        0
+      ],
+      "id": "bcb1fa09-8ce3-4891-9567-3b0569302a07",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-3.6-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        96,
+        208
+      ],
+      "id": "f59d3afc-6237-490c-ac2e-a297ec8e88a5",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "gZEBpOUSMEhvgLDY",
+          "name": "Google Gemini(PaLM) Api account 2"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.4,
+      "position": [
+        240,
+        208
+      ],
+      "id": "c2cc3f6e-a253-4d7f-961f-90a620f01328",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1LDfba-ddohz4dnZUEFlaPoHl8EjthYyj6wgLBIQT4to",
+          "mode": "list",
+          "cachedResultName": "Data Produk NF Academy",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1LDfba-ddohz4dnZUEFlaPoHl8EjthYyj6wgLBIQT4to/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1LDfba-ddohz4dnZUEFlaPoHl8EjthYyj6wgLBIQT4to/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        384,
+        208
+      ],
+      "id": "3bb7657a-36cf-4f42-8ca8-6a41613b48af",
+      "name": "Get row(s) in sheet in Google Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Zw1MFjF8MlJizlNt",
+          "name": "Google Sheets account 2"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet in Google Sheets": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "7bc6da83-2ed9-4a27-9d17-dfbc0e4f6e9c",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "dc96f10ae7dc95d3c138575ba243a0a167923dbcb524841d451aadf9135d5fb3"
+  },
+  "nodeGroups": [],
+  "id": "MTArbQf4Ri4Sm0AT",
+  "tags": []
+}
